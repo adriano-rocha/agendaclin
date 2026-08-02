@@ -47,4 +47,4 @@ _(em breve — instruções após o setup do ambiente)_
 
 ## 📄 Licença
 
-Projeto de fins didáticos.
+Projeto de fins didáticos...
