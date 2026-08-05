@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Perfil {
+  PACIENTE
+  ADMIN
+}
+
+enum StatusAgendamento {
+  PENDENTE
+  CONFIRMADO
+  CANCELADO
+  CONCLUIDO
+}
+
+model Usuario {
+  id           Int      @id @default(autoincrement())
+  nome         String
+  email        String   @unique
+  senhaHash    String
+  perfil       Perfil   @default(PACIENTE)
+  criadoEm     DateTime @default(now())
+
+  agendamentos Agendamento[]
+}
+
+model Especialidade {
+  id            Int            @id @default(autoincrement())
+  nome          String         @unique
+  duracaoPadrao Int            // duração da consulta em minutos
+
+  profissionais Profissional[]
+}
+
+model Profissional {
+  id              Int           @id @default(autoincrement())
+  nome            String
+  especialidadeId Int
+  especialidade   Especialidade @relation(fields: [especialidadeId], references: [id])
+
+  agendamentos    Agendamento[]
+}
+
+model Agendamento {
+  id             Int               @id @default(autoincrement())
+  dataHoraInicio DateTime
+  dataHoraFim    DateTime
+  status         StatusAgendamento @default(PENDENTE)
+  criadoEm       DateTime          @default(now())
+
+  usuarioId       Int
+  usuario         Usuario       @relation(fields: [usuarioId], references: [id])
+
+  profissionalId  Int
+  profissional    Profissional  @relation(fields: [profissionalId], references: [id])
+}
