@@ -1,12 +1,16 @@
 import express from "express";
 import { usuarioRoutes } from "./infra/http/routes/usuario.routes";
 import { autenticacaoRoutes } from "./infra/http/routes/autenticacao.routes";
+import { especialidadeRoutes } from "./infra/http/routes/especialidade.routes";
+import { profissionalRoutes } from "./infra/http/routes/profissional.routes";
 import { autenticar } from "./infra/http/middlewares/autenticar";
 
 const app = express();
 app.use(express.json());
 app.use(usuarioRoutes);
 app.use(autenticacaoRoutes);
+app.use(especialidadeRoutes);
+app.use(profissionalRoutes);
 
 app.get("/perfil", autenticar, (req, res) => {
   res.status(200).json({ mensagem: "Acesso liberado", usuario: req.usuario });
