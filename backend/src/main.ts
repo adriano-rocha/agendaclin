@@ -1,4 +1,5 @@
 import express from "express";
+import cors from 'cors';
 import { usuarioRoutes } from "./infra/http/routes/usuario.routes";
 import { autenticacaoRoutes } from "./infra/http/routes/autenticacao.routes";
 import { especialidadeRoutes } from "./infra/http/routes/especialidade.routes";
@@ -8,6 +9,7 @@ import { agendamentoRoutes } from "./infra/http/routes/agendamento.routes";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 app.use(usuarioRoutes);
 app.use(autenticacaoRoutes);
 app.use(especialidadeRoutes);
