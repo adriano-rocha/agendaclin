@@ -1,8 +1,21 @@
+// backend/src/infra/database/repositories/PrismaAgendamentoRepository.ts
+
 import { PrismaClient } from '@prisma/client';
-import { IAgendamentoRepository } from '../../../domain/repositories/IAgendamentoRepository';
+import { IAgendamentoRepository, FiltrosAgendamento } from '../../../domain/repositories/IAgendamentoRepository';
 import { Agendamento, StatusAgendamento } from '../../../domain/entities/Agendamento';
 
 const prisma = new PrismaClient();
+
+function paraEntidade(a: any): Agendamento {
+  return new Agendamento(
+    a.id,
+    a.usuarioId,
+    a.profissionalId,
+    a.dataHoraInicio,
+    a.dataHoraFim,
+    a.status as StatusAgendamento,
+  );
+}
 
 export class PrismaAgendamentoRepository implements IAgendamentoRepository {
   async criar(agendamento: Agendamento): Promise<Agendamento> {
@@ -15,15 +28,7 @@ export class PrismaAgendamentoRepository implements IAgendamentoRepository {
         status: agendamento.status,
       },
     });
-
-    return new Agendamento(
-      criado.id,
-      criado.usuarioId,
-      criado.profissionalId,
-      criado.dataHoraInicio,
-      criado.dataHoraFim,
-      criado.status as StatusAgendamento,
-    );
+    return paraEntidade(criado);
   }
 
   async buscarConflitosDoDia(
@@ -39,17 +44,48 @@ export class PrismaAgendamentoRepository implements IAgendamentoRepository {
         OR: [{ profissionalId }, { usuarioId }],
       },
     });
+    return encontrados.map(paraEntidade);
+  }
 
-    return encontrados.map(
-      (a) =>
-        new Agendamento(
-          a.id,
-          a.usuarioId,
-          a.profissionalId,
-          a.dataHoraInicio,
-          a.dataHoraFim,
-          a.status as StatusAgendamento,
-        ),
-    );
+  async buscarPorId(id: number): Promise<Agendamento | null> {
+    const encontrado = await prisma.agendamento.findUnique({ where: { id } });
+    return encontrado ? paraEntidade(encontrado) : null;
+  }
+
+  async listar(
+    filtros: FiltrosAgendamento,
+    pagina: number,
+    limite: number,
+  ): Promise<{ dados: Agendamento[]; total: number }> {
+    const where: any = {};
+
+    if (filtros.usuarioId) where.usuarioId = filtros.usuarioId;
+    if (filtros.profissionalId) where.profissionalId = filtros.profissionalId;
+    if (filtros.status) where.status = filtros.status;
+    if (filtros.dataInicio || filtros.dataFim) {
+      where.dataHoraInicio = {};
+      if (filtros.dataInicio) where.dataHoraInicio.gte = filtros.dataInicio;
+      if (filtros.dataFim) where.dataHoraInicio.lte = filtros.dataFim;
+    }
+
+    const [dados, total] = await Promise.all([
+      prisma.agendamento.findMany({
+        where,
+        skip: (pagina - 1) * limite,
+        take: limite,
+        orderBy: { dataHoraInicio: 'asc' },
+      }),
+      prisma.agendamento.count({ where }),
+    ]);
+
+    return { dados: dados.map(paraEntidade), total };
+  }
+
+  async atualizarStatus(id: number, status: string): Promise<Agendamento> {
+    const atualizado = await prisma.agendamento.update({
+      where: { id },
+      data: { status: status as StatusAgendamento },
+    });
+    return paraEntidade(atualizado);
   }
 }
