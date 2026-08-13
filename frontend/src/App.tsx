@@ -1,8 +1,14 @@
+// frontend/src/App.tsx
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthProvider';
 import RotaProtegida from './routes/RotaProtegida';
 import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
+import AreaLogada from './pages/AreaLogada';
+import { Agendamentos } from './pages/Agendamentos';
+import { NovoAgendamento } from './pages/NovoAgendamento';
+import Profissionais from './pages/Profissionais';
 
 function App() {
   return (
@@ -15,7 +21,31 @@ function App() {
             path="/"
             element={
               <RotaProtegida>
-                <h1>Área logada (placeholder — Dashboard vem no próximo bloco)</h1>
+                <AreaLogada />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/agendamentos"
+            element={
+              <RotaProtegida>
+                <Agendamentos />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/agendamentos/novo"
+            element={
+              <RotaProtegida>
+                <NovoAgendamento />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/profissionais"
+            element={
+              <RotaProtegida>
+                <Profissionais />
               </RotaProtegida>
             }
           />

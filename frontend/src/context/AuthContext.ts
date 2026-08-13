@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 
 export interface Usuario {
-  id: string;
+  id: number;
   nome: string;
   email: string;
   perfil: string;

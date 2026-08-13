@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 import api from '../services/api';
 import { AuthContext } from './AuthContext';
@@ -16,12 +16,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [carregando] = useState(false);
 
-  useEffect(() => {
-    if (token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-  }, [token]);
-
   async function login(email: string, senha: string) {
     const response = await api.post('/login', { email, senha });
     const { token: novoToken, usuario: novoUsuario } = response.data;
@@ -31,8 +25,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     localStorage.setItem('token', novoToken);
     localStorage.setItem('usuario', JSON.stringify(novoUsuario));
-
-    api.defaults.headers.common['Authorization'] = `Bearer ${novoToken}`;
   }
 
   function logout() {
@@ -40,7 +32,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsuario(null);
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
-    delete api.defaults.headers.common['Authorization'];
   }
 
   return (
