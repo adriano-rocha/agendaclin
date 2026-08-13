@@ -22,7 +22,7 @@ export class PrismaProfissionalRepository implements IProfissionalRepository {
     });
 
     return profissionais.map(
-      (p) => new Profissional(p.id, p.nome, p.especialidadeId)
-    );
-  }
+    (p) => new Profissional(p.id, p.nome, p.especialidadeId, p.especialidade)
+  );
+}
 }

@@ -1,5 +1,3 @@
-// backend/src/infra/http/controllers/AgendamentoController.ts
-
 import { Request, Response } from "express";
 import { CriarAgendamento } from "../../../application/use-cases/CriarAgendamento";
 import { ListarAgendamentos } from "../../../application/use-cases/ListarAgendamentos";
