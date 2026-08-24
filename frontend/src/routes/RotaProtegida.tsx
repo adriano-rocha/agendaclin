@@ -1,12 +1,7 @@
-import type { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-interface RotaProtegidaProps {
-  children: ReactNode;
-}
-
-export default function RotaProtegida({ children }: RotaProtegidaProps) {
+export default function RotaProtegida() {
   const { usuario, carregando } = useAuth();
 
   if (carregando) {
@@ -17,5 +12,5 @@ export default function RotaProtegida({ children }: RotaProtegidaProps) {
     return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>;
+  return <Outlet />;
 }
