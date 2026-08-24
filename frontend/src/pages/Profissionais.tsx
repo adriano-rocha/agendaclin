@@ -1,13 +1,7 @@
 import { useState, useEffect } from 'react';
 import { listarProfissionais } from '../services/profissionalService';
 import type { Profissional } from '../types/Profissional';
-
-function obterIniciais(nome: string): string {
-  const partes = nome.trim().split(' ');
-  const primeira = partes[0]?.[0] ?? '';
-  const ultima = partes.length > 1 ? partes[partes.length - 1][0] : '';
-  return (primeira + ultima).toUpperCase();
-}
+import { AvatarProfissional } from '../components/AvatarProfissional';
 
 export default function Profissionais() {
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
@@ -59,8 +53,8 @@ export default function Profissionais() {
             key={prof.id}
             className="bg-white border border-gray-200 rounded-lg shadow-sm p-5 flex flex-col items-center text-center"
           >
-            <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-700 font-semibold text-lg flex items-center justify-center mb-3">
-              {obterIniciais(prof.nome)}
+            <div className="mb-3">
+              <AvatarProfissional nome={prof.nome} especialidade={prof.especialidade?.nome} />
             </div>
             <h2 className="text-sm font-semibold text-gray-900">{prof.nome}</h2>
             <span className="text-xs text-gray-500 mt-1">{prof.especialidade?.nome}</span>

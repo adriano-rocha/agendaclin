@@ -5,6 +5,7 @@ import { useAgendamentos } from '../hooks/useAgendamentos';
 import { useAuth } from '../hooks/useAuth';
 import type { Profissional } from '../types/Profissional';
 import type { Especialidade } from '../types/Especialidade';
+import { AvatarProfissional } from '../components/AvatarProfissional';
 
 const HORARIOS_DISPONIVEIS = [
   '08:00', '09:00', '10:00', '11:00', '12:00',
@@ -14,13 +15,6 @@ const HORARIOS_DISPONIVEIS = [
 function obterDataMinima(): string {
   const hoje = new Date();
   return hoje.toISOString().slice(0, 10); // formato "AAAA-MM-DD"
-}
-
-function obterIniciais(nome: string): string {
-  const partes = nome.trim().split(' ');
-  const primeira = partes[0]?.[0] ?? '';
-  const ultima = partes.length > 1 ? partes[partes.length - 1][0] : '';
-  return (primeira + ultima).toUpperCase();
 }
 
 export function NovoAgendamento() {
@@ -148,9 +142,7 @@ export function NovoAgendamento() {
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center">
-                    {obterIniciais(prof.nome)}
-                  </div>
+                  <AvatarProfissional nome={prof.nome} especialidade={prof.especialidade?.nome} tamanho="sm" />
                   <span className="text-sm font-medium text-gray-900">{prof.nome}</span>
                   <span className="text-xs text-gray-500">{prof.especialidade?.nome}</span>
                 </button>

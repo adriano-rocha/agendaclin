@@ -20,6 +20,7 @@ async function main() {
     });
   }
 
+  const psicologia = await prisma.especialidade.findUniqueOrThrow({ where: { nome: 'Psicologia' } });
   const nutricao = await prisma.especialidade.findUniqueOrThrow({ where: { nome: 'Nutrição' } });
   const odontologia = await prisma.especialidade.findUniqueOrThrow({ where: { nome: 'Odontologia' } });
   const cardiologia = await prisma.especialidade.findUniqueOrThrow({ where: { nome: 'Cardiologia' } });
@@ -27,8 +28,9 @@ async function main() {
   const dermatologia = await prisma.especialidade.findUniqueOrThrow({ where: { nome: 'Dermatologia' } });
 
   const profissionais = [
-    { nome: 'Dra. Marcele Asevedo', especialidadeId: nutricao.id },
-    { nome: 'Dra. Helena Rocha', especialidadeId: odontologia.id },
+    { nome: 'Dra. Mirian Barbosa', especialidadeId: psicologia.id },
+    { nome: 'Dra. Jussara Nunes', especialidadeId: nutricao.id },
+    { nome: 'Dra. Juliana Passaniante', especialidadeId: odontologia.id },
     { nome: 'Dr. Ricardo Borges', especialidadeId: cardiologia.id },
     { nome: 'Dr. Breno Lopes', especialidadeId: oftalmologia.id },
     { nome: 'Dra. Julia Aguiar', especialidadeId: dermatologia.id },
