@@ -1,7 +1,6 @@
 interface ModalConfirmacaoProps {
   titulo: string;
   mensagem: string;
-  erro?: string | null;
   onConfirmar: () => void;
   onCancelar: () => void;
 }
@@ -9,7 +8,6 @@ interface ModalConfirmacaoProps {
 export function ModalConfirmacao({
   titulo,
   mensagem,
-  erro,
   onConfirmar,
   onCancelar,
 }: ModalConfirmacaoProps) {
@@ -18,8 +16,6 @@ export function ModalConfirmacao({
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
         <h3 className="text-lg font-semibold text-gray-900">{titulo}</h3>
         <p className="mt-2 text-sm text-gray-600">{mensagem}</p>
-
-        {erro && <p className="mt-3 text-sm text-red-600">{erro}</p>}
 
         <div className="mt-6 flex justify-end gap-3">
           <button

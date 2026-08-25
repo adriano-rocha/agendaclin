@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { listarProfissionais, listarEspecialidades } from '../services/profissionalService';
 import { useAgendamentos } from '../hooks/useAgendamentos';
 import { useAuth } from '../hooks/useAuth';
@@ -32,7 +33,6 @@ export function NovoAgendamento() {
   const [horario, setHorario] = useState('');
 
   const [enviando, setEnviando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
 
   const dataMinima = obterDataMinima();
 
@@ -46,7 +46,7 @@ export function NovoAgendamento() {
         setEspecialidades(especialidadesRes);
         setProfissionais(profissionaisRes);
       } catch {
-        setErro('Não foi possível carregar especialidades/profissionais.');
+        toast.error('Não foi possível carregar especialidades/profissionais.');
       } finally {
         setCarregandoOpcoes(false);
       }
@@ -65,7 +65,6 @@ export function NovoAgendamento() {
     if (!usuario) return;
 
     setEnviando(true);
-    setErro(null);
 
     try {
       const dataHoraInicio = new Date(`${data}T${horario}:00`);
@@ -75,9 +74,10 @@ export function NovoAgendamento() {
         profissionalId: Number(profissionalId),
         dataHoraInicio: dataHoraInicio.toISOString(),
       });
+      toast.success('Agendamento criado com sucesso!');
       navigate('/agendamentos');
     } catch {
-      setErro('Não foi possível criar o agendamento. Verifique o horário e tente novamente.');
+      toast.error('Não foi possível criar o agendamento. Verifique o horário e tente novamente.');
     } finally {
       setEnviando(false);
     }
@@ -179,8 +179,6 @@ export function NovoAgendamento() {
             ))}
           </select>
         </label>
-
-        {erro && <p className="text-sm text-red-600">{erro}</p>}
 
         <button
           type="submit"

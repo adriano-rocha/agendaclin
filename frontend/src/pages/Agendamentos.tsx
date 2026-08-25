@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAgendamentos } from '../hooks/useAgendamentos';
 import { ModalConfirmacao } from '../components/ModalConfirmacao';
 import { useAuth } from '../hooks/useAuth';
@@ -21,22 +22,21 @@ export function Agendamentos() {
     useAgendamentos(1, statusFiltro);
   const { usuario } = useAuth();
   const [acaoPendente, setAcaoPendente] = useState<AcaoPendente>(null);
-  const [erroAcao, setErroAcao] = useState<string | null>(null);
 
   async function executarAcaoPendente() {
     if (!acaoPendente) return;
 
-    setErroAcao(null);
-
     try {
       if (acaoPendente.tipo === 'cancelar') {
         await cancelar(acaoPendente.id);
+        toast.success('Agendamento cancelado.');
       } else {
         await confirmar(acaoPendente.id);
+        toast.success('Agendamento confirmado.');
       }
       setAcaoPendente(null);
     } catch {
-      setErroAcao(
+      toast.error(
         acaoPendente.tipo === 'cancelar'
           ? 'Cancelamento só é permitido com no mínimo 2h de antecedência.'
           : 'Não foi possível confirmar este agendamento.'
@@ -155,12 +155,8 @@ export function Agendamentos() {
         <ModalConfirmacao
           titulo={acaoPendente.tipo === 'cancelar' ? 'Cancelar agendamento' : 'Confirmar agendamento'}
           mensagem={`Tem certeza que deseja ${acaoPendente.tipo === 'cancelar' ? 'cancelar' : 'confirmar'} este agendamento?`}
-          erro={erroAcao}
           onConfirmar={executarAcaoPendente}
-          onCancelar={() => {
-            setAcaoPendente(null);
-            setErroAcao(null);
-          }}
+          onCancelar={() => setAcaoPendente(null)}
         />
       )}
     </div>

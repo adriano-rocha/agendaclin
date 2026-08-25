@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
 
   const { login } = useAuth();
@@ -14,14 +14,13 @@ export default function Login() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    setErro('');
     setCarregando(true);
 
     try {
       await login(email, senha);
       navigate('/agendamentos');
     } catch {
-      setErro('E-mail ou senha inválidos.');
+      toast.error('E-mail ou senha inválidos.');
     } finally {
       setCarregando(false);
     }
@@ -56,8 +55,6 @@ export default function Login() {
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700"
             />
           </label>
-
-          {erro && <p className="text-sm text-red-600">{erro}</p>}
 
           <button
             type="submit"
