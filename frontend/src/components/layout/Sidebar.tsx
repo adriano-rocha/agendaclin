@@ -45,7 +45,14 @@ export function Sidebar() {
       </nav>
 
       <div className="flex flex-col gap-2 border-t border-gray-700 pt-4 text-sm text-gray-300">
-        <span>{usuario?.nome}</span>
+        <NavLink
+          to="/perfil"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkAtivo : ""}`
+          }
+        >
+          {usuario?.nome}
+        </NavLink>
         <button
           onClick={logout}
           className="rounded-md border-2 border-gray-600 px-3 py-1.5 text-gray-200 transition-colors hover:border-blue-500"

@@ -11,6 +11,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Agendamentos } from './pages/Agendamentos';
 import { NovoAgendamento } from './pages/NovoAgendamento';
 import Profissionais from './pages/Profissionais';
+import Perfil from './pages/Perfil';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route path="/agendamentos" element={<Agendamentos />} />
               <Route path="/agendamentos/novo" element={<NovoAgendamento />} />
               <Route path="/profissionais" element={<Profissionais />} />
+               <Route path="/perfil" element={<Perfil />} />
             </Route>
           </Route>
 

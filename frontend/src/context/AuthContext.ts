@@ -12,6 +12,7 @@ export interface AuthContextData {
   token: string | null;
   login: (email: string, senha: string) => Promise<void>;
   logout: () => void;
+  atualizarUsuario: (usuario: Usuario) => void;
   carregando: boolean;
 }
 
