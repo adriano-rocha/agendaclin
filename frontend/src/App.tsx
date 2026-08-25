@@ -1,6 +1,7 @@
 // frontend/src/App.tsx
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthProvider';
 import RotaProtegida from './routes/RotaProtegida';
 import { DashboardLayout } from './components/layout/DashboardLayout';
@@ -16,6 +17,7 @@ import Perfil from './pages/Perfil';
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-right" />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />

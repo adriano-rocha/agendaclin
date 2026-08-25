@@ -1,34 +1,29 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 import { atualizarPerfil, alterarSenha } from "../services/usuarioService";
 
 export default function Perfil() {
-    const { usuario, logout, atualizarUsuario } = useAuth();
+  const { usuario, logout, atualizarUsuario } = useAuth();
 
   const [nome, setNome] = useState(usuario?.nome ?? "");
   const [email, setEmail] = useState(usuario?.email ?? "");
-  const [mensagemPerfil, setMensagemPerfil] = useState("");
-  const [erroPerfil, setErroPerfil] = useState("");
   const [salvandoPerfil, setSalvandoPerfil] = useState(false);
 
   const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
-  const [mensagemSenha, setMensagemSenha] = useState("");
-  const [erroSenha, setErroSenha] = useState("");
   const [salvandoSenha, setSalvandoSenha] = useState(false);
 
-    async function handleSalvarPerfil(e: React.FormEvent) {
+  async function handleSalvarPerfil(e: React.FormEvent) {
     e.preventDefault();
-    setErroPerfil("");
-    setMensagemPerfil("");
     setSalvandoPerfil(true);
 
     try {
       const usuarioAtualizado = await atualizarPerfil({ nome, email });
       atualizarUsuario(usuarioAtualizado);
-      setMensagemPerfil("Dados atualizados com sucesso.");
+      toast.success("Dados atualizados com sucesso.");
     } catch {
-      setErroPerfil("Não foi possível atualizar seus dados. Verifique o e-mail informado.");
+      toast.error("Não foi possível atualizar seus dados. Verifique o e-mail informado.");
     } finally {
       setSalvandoPerfil(false);
     }
@@ -36,17 +31,15 @@ export default function Perfil() {
 
   async function handleAlterarSenha(e: React.FormEvent) {
     e.preventDefault();
-    setErroSenha("");
-    setMensagemSenha("");
     setSalvandoSenha(true);
 
     try {
       await alterarSenha({ senhaAtual, novaSenha });
-      setMensagemSenha("Senha alterada com sucesso.");
+      toast.success("Senha alterada com sucesso.");
       setSenhaAtual("");
       setNovaSenha("");
     } catch {
-      setErroSenha("Senha atual incorreta.");
+      toast.error("Senha atual incorreta.");
     } finally {
       setSalvandoSenha(false);
     }
@@ -81,9 +74,6 @@ export default function Perfil() {
           />
         </div>
 
-        {erroPerfil && <p className="text-red-600 text-sm">{erroPerfil}</p>}
-        {mensagemPerfil && <p className="text-green-600 text-sm">{mensagemPerfil}</p>}
-
         <button
           type="submit"
           disabled={salvandoPerfil}
@@ -117,9 +107,6 @@ export default function Perfil() {
             required
           />
         </div>
-
-        {erroSenha && <p className="text-red-600 text-sm">{erroSenha}</p>}
-        {mensagemSenha && <p className="text-green-600 text-sm">{mensagemSenha}</p>}
 
         <button
           type="submit"
