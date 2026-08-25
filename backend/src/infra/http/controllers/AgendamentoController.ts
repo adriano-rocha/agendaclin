@@ -10,20 +10,26 @@ const agendamentoRepository = new PrismaAgendamentoRepository();
 
 export async function criarAgendamentoController(req: Request, res: Response) {
   try {
-    const { usuarioId, profissionalId, dataHoraInicio } = req.body;
+    const usuarioLogado = req.usuario;
 
-    if (!usuarioId || !profissionalId || !dataHoraInicio) {
+    if (!usuarioLogado) {
+      return res.status(401).json({ erro: "Usuário não autenticado." });
+    }
+
+    const { profissionalId, dataHoraInicio } = req.body;
+
+    if (!profissionalId || !dataHoraInicio) {
       return res
         .status(400)
         .json({
-          erro: "usuarioId, profissionalId e dataHoraInicio são obrigatórios.",
+          erro: "profissionalId e dataHoraInicio são obrigatórios.",
         });
     }
 
     const criarAgendamento = new CriarAgendamento(agendamentoRepository);
 
     const novoAgendamento = await criarAgendamento.executar({
-      usuarioId: Number(usuarioId),
+      usuarioId: usuarioLogado.id,
       profissionalId: Number(profissionalId),
       dataHoraInicio: new Date(dataHoraInicio),
     });
@@ -47,16 +53,21 @@ export async function listarAgendamentosController(
       req.query;
     const usuarioLogado = req.usuario;
 
-    const filtros: any = {};
-
     if (!usuarioLogado) {
       return res.status(401).json({ erro: "Usuário não autenticado." });
     }
+
+    const filtros: any = {};
 
     if (profissionalId) filtros.profissionalId = Number(profissionalId);
     if (status) filtros.status = String(status);
     if (dataInicio) filtros.dataInicio = new Date(String(dataInicio));
     if (dataFim) filtros.dataFim = new Date(String(dataFim));
+
+    // Regra de permissão: não-admin só vê os próprios agendamentos
+    if (usuarioLogado.perfil !== "ADMIN") {
+      filtros.usuarioId = usuarioLogado.id;
+    }
 
     const listarAgendamentos = new ListarAgendamentos(agendamentoRepository);
 
