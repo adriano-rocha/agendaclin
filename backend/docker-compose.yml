@@ -4,7 +4,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: agendaclin
-      POSTGRES_PASSWORD: agendaclin123
+      POSTGRES_PASSWORD: lha1723*
       POSTGRES_DB: agendaclin_db
     ports:
       - "5433:5432"
