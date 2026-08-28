@@ -16,3 +16,8 @@ usuarioRoutes.patch("/usuarios/me/senha", autenticar, (req, res) =>
 );
 
 export { usuarioRoutes };
+
+
+
+
+
