@@ -1,11 +1,12 @@
-// frontend/src/pages/Agendamentos.tsx
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAgendamentos } from '../hooks/useAgendamentos';
+import { useProfissionaisMap } from '../hooks/useProfissionaisMap';
 import { ModalConfirmacao } from '../components/ModalConfirmacao';
+import { ModalDetalheAgendamento } from '../components/ModalDetalheAgendamento';
 import { useAuth } from '../hooks/useAuth';
+import type { Agendamento } from '../types/Agendamento';
 
 type AcaoPendente = { tipo: 'cancelar' | 'confirmar'; id: number } | null;
 
@@ -21,7 +22,9 @@ export function Agendamentos() {
   const { agendamentos, pagina, setPagina, totalPaginas, carregando, erro, cancelar, confirmar } =
     useAgendamentos(1, statusFiltro);
   const { usuario } = useAuth();
+  const { mapa: profissionaisMap } = useProfissionaisMap();
   const [acaoPendente, setAcaoPendente] = useState<AcaoPendente>(null);
+  const [agendamentoSelecionado, setAgendamentoSelecionado] = useState<Agendamento | null>(null);
 
   async function executarAcaoPendente() {
     if (!acaoPendente) return;
@@ -62,14 +65,14 @@ export function Agendamentos() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Meus Agendamentos</h1>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <select
             value={statusFiltro ?? ''}
             onChange={(e) => setStatusFiltro(e.target.value || undefined)}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 sm:w-auto"
           >
             <option value="">Todos os status</option>
             <option value="PENDENTE">Pendente</option>
@@ -80,7 +83,7 @@ export function Agendamentos() {
 
           <Link
             to="/agendamentos/novo"
-            className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700"
+            className="w-full text-center bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700 sm:w-auto"
           >
             + Novo Agendamento
           </Link>
@@ -95,7 +98,8 @@ export function Agendamentos() {
         {agendamentos.map((agendamento) => (
           <li
             key={agendamento.id}
-            className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+            onClick={() => setAgendamentoSelecionado(agendamento)}
+            className="flex flex-col gap-3 bg-white border border-gray-200 rounded-xl p-4 shadow-sm cursor-pointer transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex flex-col gap-1">
               <span className="text-sm font-medium text-gray-900">
@@ -111,7 +115,10 @@ export function Agendamentos() {
             <div className="flex gap-2">
               {agendamento.status === 'PENDENTE' && (
                 <button
-                  onClick={() => setAcaoPendente({ tipo: 'cancelar', id: agendamento.id })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAcaoPendente({ tipo: 'cancelar', id: agendamento.id });
+                  }}
                   className="px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 rounded-md hover:bg-red-100"
                 >
                   Cancelar
@@ -120,7 +127,10 @@ export function Agendamentos() {
 
               {agendamento.status === 'PENDENTE' && usuario?.perfil === 'ADMIN' && (
                 <button
-                  onClick={() => setAcaoPendente({ tipo: 'confirmar', id: agendamento.id })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAcaoPendente({ tipo: 'confirmar', id: agendamento.id });
+                  }}
                   className="px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 rounded-md hover:bg-green-100"
                 >
                   Confirmar
@@ -157,6 +167,14 @@ export function Agendamentos() {
           mensagem={`Tem certeza que deseja ${acaoPendente.tipo === 'cancelar' ? 'cancelar' : 'confirmar'} este agendamento?`}
           onConfirmar={executarAcaoPendente}
           onCancelar={() => setAcaoPendente(null)}
+        />
+      )}
+
+      {agendamentoSelecionado && (
+        <ModalDetalheAgendamento
+          agendamento={agendamentoSelecionado}
+          profissional={profissionaisMap[agendamentoSelecionado.profissionalId]}
+          onFechar={() => setAgendamentoSelecionado(null)}
         />
       )}
     </div>

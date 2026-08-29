@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import type { Profissional } from '../types/Profissional';
 import type { Especialidade } from '../types/Especialidade';
 import { AvatarProfissional } from '../components/AvatarProfissional';
+import { registroFicticio } from '../utils/registroProfissional';
 
 const HORARIOS_DISPONIVEIS = [
   '08:00', '09:00', '10:00', '11:00', '12:00',
@@ -15,7 +16,7 @@ const HORARIOS_DISPONIVEIS = [
 
 function obterDataMinima(): string {
   const hoje = new Date();
-  return hoje.toISOString().slice(0, 10); // formato "AAAA-MM-DD"
+  return hoje.toISOString().slice(0, 10);
 }
 
 export function NovoAgendamento() {
@@ -145,6 +146,9 @@ export function NovoAgendamento() {
                   <AvatarProfissional nome={prof.nome} especialidade={prof.especialidade?.nome} tamanho="sm" />
                   <span className="text-sm font-medium text-gray-900">{prof.nome}</span>
                   <span className="text-xs text-gray-500">{prof.especialidade?.nome}</span>
+                  <span className="text-xs text-gray-400">
+                    {registroFicticio(prof.especialidade?.nome)}
+                  </span>
                 </button>
               );
             })}

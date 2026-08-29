@@ -1,3 +1,4 @@
+// frontend/src/hooks/useMetricas.ts
 import { useState, useEffect, useCallback } from 'react';
 import { listarAgendamentos } from '../services/agendamentoService';
 import type { Agendamento } from '../types/Agendamento';
@@ -6,6 +7,12 @@ interface Metricas {
   total: number;
   pendentes: number;
   confirmadosHoje: number;
+}
+
+interface ListasPorCategoria {
+  total: Agendamento[];
+  pendentes: Agendamento[];
+  confirmadosHoje: Agendamento[];
 }
 
 function ehHoje(dataHoraInicio: string) {
@@ -23,6 +30,11 @@ export function useMetricas() {
     total: 0,
     pendentes: 0,
     confirmadosHoje: 0,
+  });
+  const [listas, setListas] = useState<ListasPorCategoria>({
+    total: [],
+    pendentes: [],
+    confirmadosHoje: [],
   });
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -45,13 +57,17 @@ export function useMetricas() {
         });
       }
 
+      const pendentes = todos.filter((a) => a.status === 'PENDENTE');
+      const confirmadosHoje = todos.filter(
+        (a) => a.status === 'CONFIRMADO' && ehHoje(a.dataHoraInicio)
+      );
+
       setMetricas({
         total: todos.length,
-        pendentes: todos.filter((a) => a.status === 'PENDENTE').length,
-        confirmadosHoje: todos.filter(
-          (a) => a.status === 'CONFIRMADO' && ehHoje(a.dataHoraInicio)
-        ).length,
+        pendentes: pendentes.length,
+        confirmadosHoje: confirmadosHoje.length,
       });
+      setListas({ total: todos, pendentes, confirmadosHoje });
     } catch {
       setErro('Não foi possível carregar as métricas.');
     } finally {
@@ -65,5 +81,5 @@ export function useMetricas() {
     });
   }, [buscar]);
 
-  return { metricas, carregando, erro };
+  return { metricas, listas, carregando, erro };
 }

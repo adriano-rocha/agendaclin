@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { listarProfissionais } from '../services/profissionalService';
 import type { Profissional } from '../types/Profissional';
 import { AvatarProfissional } from '../components/AvatarProfissional';
+import { registroFicticio } from '../utils/registroProfissional';
 
 export default function Profissionais() {
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
@@ -58,6 +59,9 @@ export default function Profissionais() {
             </div>
             <h2 className="text-sm font-semibold text-gray-900">{prof.nome}</h2>
             <span className="text-xs text-gray-500 mt-1">{prof.especialidade?.nome}</span>
+            <span className="text-xs text-gray-400 mt-0.5">
+              {registroFicticio(prof.especialidade?.nome)}
+            </span>
           </div>
         ))}
       </div>
