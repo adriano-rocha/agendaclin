@@ -9,7 +9,18 @@ import { agendamentoRoutes } from "./infra/http/routes/agendamento.routes";
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+const origensPermitidas = [
+  "http://localhost:5173",
+  "https://agendaclin-dun.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: origensPermitidas,
+  })
+);
+
 app.use(usuarioRoutes);
 app.use(autenticacaoRoutes);
 app.use(especialidadeRoutes);
