@@ -12,7 +12,7 @@ app.use(express.json());
 
 const origensPermitidas = [
   "http://localhost:5173",
-  "https://agendaclin-dun.vercel.app",
+  "https://agendaclin-sp.vercel.app",
 ];
 
 app.use(
