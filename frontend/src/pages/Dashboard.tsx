@@ -1,18 +1,22 @@
+// frontend/src/pages/Dashboard.tsx
 import { useState } from "react";
-import { ClipboardList, Clock, CheckCircle2 } from "lucide-react";
 import { useMetricas } from "../hooks/useMetricas";
 import { useAuth } from "../hooks/useAuth";
 import { useProfissionaisMap } from "../hooks/useProfissionaisMap";
 import { ModalListaAgendamentos } from "../components/ModalListaAgendamentos";
+import { Sparkline } from "../components/Sparkline";
+import { DonutStatusAgendamentos } from "../components/DonutStatusAgendamentos";
+import { BarraComparativaAgendamentos } from "../components/BarraComparativaAgendamentos";
 
-type CategoriaCard = "total" | "pendentes" | "confirmadosHoje";
+type CategoriaCard = "total" | "pendentes" | "confirmadosHoje" | "faltaram";
 
 interface CardMetricaProps {
   titulo: string;
   valor: number;
   corAccent: string;
-  corFundoIcone: string;
-  icone: React.ElementType;
+  corBarra: string;
+  corHex: string;
+  tendencia: number[];
   onClick: () => void;
 }
 
@@ -20,20 +24,22 @@ function CardMetrica({
   titulo,
   valor,
   corAccent,
-  corFundoIcone,
-  icone: Icone,
+  corBarra,
+  corHex,
+  tendencia,
   onClick,
 }: CardMetricaProps) {
   return (
     <button
       onClick={onClick}
-      className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-left transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#055DF9]"
+      className="relative flex items-center justify-between gap-4 overflow-hidden rounded-xl border border-gray-200 bg-white p-5 pl-6 text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#055DF9]"
     >
-      <div className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg ${corFundoIcone}`}>
-        <Icone size={20} className={corAccent} />
+      <span className={`absolute inset-y-0 left-0 w-1.5 ${corBarra}`} />
+      <div>
+        <p className="text-sm text-gray-500">{titulo}</p>
+        <p className={`mt-1 text-3xl font-semibold ${corAccent}`}>{valor}</p>
       </div>
-      <p className="text-sm text-gray-500">{titulo}</p>
-      <p className={`mt-1 text-3xl font-semibold ${corAccent}`}>{valor}</p>
+      <Sparkline dados={tendencia} cor={corHex} />
     </button>
   );
 }
@@ -42,13 +48,16 @@ const TITULOS_MODAL: Record<CategoriaCard, string> = {
   total: "Total de agendamentos",
   pendentes: "Agendamentos pendentes",
   confirmadosHoje: "Confirmados hoje",
+  faltaram: "Pacientes que faltaram",
 };
 
 export function Dashboard() {
-  const { metricas, listas, carregando, erro } = useMetricas();
+  const { metricas, listas, tendencias, carregando, erro } = useMetricas();
   const { usuario } = useAuth();
   const { mapa: profissionaisMap } = useProfissionaisMap();
-  const [categoriaAberta, setCategoriaAberta] = useState<CategoriaCard | null>(null);
+  const [categoriaAberta, setCategoriaAberta] = useState<CategoriaCard | null>(
+    null,
+  );
 
   return (
     <div className="space-y-8">
@@ -66,30 +75,59 @@ export function Dashboard() {
       {erro && <p className="text-red-600">{erro}</p>}
 
       {!carregando && !erro && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <CardMetrica
             titulo="Total de agendamentos"
             valor={metricas.total}
             corAccent="text-[#055DF9]"
-            corFundoIcone="bg-blue-50"
-            icone={ClipboardList}
+            corBarra="bg-[#055DF9]"
+            corHex="#055DF9"
+            tendencia={tendencias.total}
             onClick={() => setCategoriaAberta("total")}
           />
           <CardMetrica
             titulo="Pendentes"
             valor={metricas.pendentes}
             corAccent="text-yellow-600"
-            corFundoIcone="bg-yellow-50"
-            icone={Clock}
+            corBarra="bg-yellow-500"
+            corHex="#ca8a04"
+            tendencia={tendencias.pendentes}
             onClick={() => setCategoriaAberta("pendentes")}
           />
           <CardMetrica
             titulo="Confirmados hoje"
             valor={metricas.confirmadosHoje}
             corAccent="text-green-600"
-            corFundoIcone="bg-green-50"
-            icone={CheckCircle2}
+            corBarra="bg-green-600"
+            corHex="#16a34a"
+            tendencia={tendencias.confirmadosHoje}
             onClick={() => setCategoriaAberta("confirmadosHoje")}
+          />
+          <CardMetrica
+            titulo="Faltaram"
+            valor={metricas.faltaram}
+            corAccent="text-red-600"
+            corBarra="bg-red-600"
+            corHex="#dc2626"
+            tendencia={tendencias.faltaram}
+            onClick={() => setCategoriaAberta("faltaram")}
+          />
+        </div>
+      )}
+
+      {!carregando && !erro && (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <DonutStatusAgendamentos
+            pendentes={metricas.pendentesAtivos}
+            confirmadosHoje={metricas.confirmadosHoje}
+            faltaram={metricas.faltaram}
+            total={metricas.total}
+          />
+          <BarraComparativaAgendamentos
+            total={metricas.total}
+            pendentes={metricas.pendentes}
+            confirmadosHoje={metricas.confirmadosHoje}
+            faltaram={metricas.faltaram}
           />
         </div>
       )}
