@@ -1,5 +1,8 @@
-import api from './api';
-import type { Agendamento, CriarAgendamentoPayload } from '../types/Agendamento';
+import api from "./api";
+import type {
+  Agendamento,
+  CriarAgendamentoPayload,
+} from "../types/Agendamento";
 
 interface ListarAgendamentosParams {
   page?: number;
@@ -17,17 +20,26 @@ interface ListarAgendamentosResponse {
 }
 
 export async function listarAgendamentos(
-  params?: ListarAgendamentosParams
+  params?: ListarAgendamentosParams,
 ): Promise<ListarAgendamentosResponse> {
-  const response = await api.get('/agendamentos', { params });
+  const response = await api.get("/agendamentos", { params });
   return response.data;
 }
 
 export async function criarAgendamento(
-  payload: CriarAgendamentoPayload
+  payload: CriarAgendamentoPayload,
 ): Promise<Agendamento> {
-  const response = await api.post('/agendamentos', payload);
+  const response = await api.post("/agendamentos", payload);
   return response.data;
+}
+export async function listarHorariosOcupados(
+  profissionalId: number,
+  data: string, // formato "YYYY-MM-DD"
+): Promise<string[]> {
+  const response = await api.get("/agendamentos/horarios-ocupados", {
+    params: { profissionalId, data },
+  });
+  return response.data.horariosOcupados;
 }
 
 export async function cancelarAgendamento(id: number): Promise<Agendamento> {
