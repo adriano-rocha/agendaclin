@@ -5,6 +5,7 @@ import { BuscarAgendamentoPorId } from "../../../application/use-cases/BuscarAge
 import { CancelarAgendamento } from "../../../application/use-cases/CancelarAgendamento";
 import { ConfirmarAgendamento } from "../../../application/use-cases/ConfirmarAgendamento";
 import { PrismaAgendamentoRepository } from "../../database/repositories/PrismaAgendamentoRepository";
+import { ListarHorariosOcupados } from "../../../application/use-cases/ListarHorariosOcupados";
 
 const agendamentoRepository = new PrismaAgendamentoRepository();
 
@@ -19,11 +20,9 @@ export async function criarAgendamentoController(req: Request, res: Response) {
     const { profissionalId, dataHoraInicio } = req.body;
 
     if (!profissionalId || !dataHoraInicio) {
-      return res
-        .status(400)
-        .json({
-          erro: "profissionalId e dataHoraInicio são obrigatórios.",
-        });
+      return res.status(400).json({
+        erro: "profissionalId e dataHoraInicio são obrigatórios.",
+      });
     }
 
     const criarAgendamento = new CriarAgendamento(agendamentoRepository);
@@ -122,6 +121,35 @@ export async function buscarAgendamentoPorIdController(
     return res
       .status(500)
       .json({ erro: "Erro interno ao buscar agendamento." });
+  }
+}
+export async function listarHorariosOcupadosController(
+  req: Request,
+  res: Response,
+) {
+  try {
+    const { profissionalId, data } = req.query;
+
+    if (!profissionalId || !data) {
+      return res
+        .status(400)
+        .json({ erro: "profissionalId e data são obrigatórios." });
+    }
+
+    const listarHorariosOcupados = new ListarHorariosOcupados(
+      agendamentoRepository,
+    );
+
+    const horariosOcupados = await listarHorariosOcupados.executar({
+      profissionalId: Number(profissionalId),
+      data: String(data),
+    });
+    return res.status(200).json({ horariosOcupados });
+  } catch (erro) {
+    console.error(erro);
+    return res
+      .status(500)
+      .json({ erro: "Erro interno ao buscar horários ocupados." });
   }
 }
 
