@@ -17,4 +17,11 @@ especialidadeRoutes.get("/especialidades", (req, res) =>
   especialidadeController.listar(req, res)
 );
 
+especialidadeRoutes.patch(
+  "/especialidades/:id",
+  autenticar,
+  somenteAdmin,
+  (req, res) => especialidadeController.atualizar(req, res)
+);
+
 export { especialidadeRoutes };

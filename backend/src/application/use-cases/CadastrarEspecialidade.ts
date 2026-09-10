@@ -4,13 +4,14 @@ import { IEspecialidadeRepository } from "../../domain/repositories/IEspecialida
 interface CadastrarEspecialidadeInput {
   nome: string;
   duracaoPadrao: number;
+  preco: number;
 }
 
 export class CadastrarEspecialidade {
   constructor(private especialidadeRepository: IEspecialidadeRepository) {}
 
   async executar(input: CadastrarEspecialidadeInput): Promise<Especialidade> {
-    const especialidade = new Especialidade(null, input.nome, input.duracaoPadrao);
+    const especialidade = new Especialidade(null, input.nome, input.duracaoPadrao, input.preco);
     return this.especialidadeRepository.criar(especialidade);
   }
 }
