@@ -1,11 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 import {
   listarAgendamentos,
   criarAgendamento,
   cancelarAgendamento,
   confirmarAgendamento,
-} from '../services/agendamentoService';
-import type { Agendamento, CriarAgendamentoPayload } from '../types/Agendamento';
+} from "../services/agendamentoService";
+import type {
+  Agendamento,
+  CriarAgendamentoPayload,
+} from "../types/Agendamento";
 
 export function useAgendamentos(paginaInicial = 1, statusFiltro?: string) {
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
@@ -18,25 +21,33 @@ export function useAgendamentos(paginaInicial = 1, statusFiltro?: string) {
     setCarregando(true);
     setErro(null);
     try {
-      const resultado = await listarAgendamentos({ page: pagina, status: statusFiltro });
+      const cortePor24h = statusFiltro
+        ? undefined
+        : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+      const resultado = await listarAgendamentos({
+        page: pagina,
+        status: statusFiltro,
+        dataInicio: cortePor24h,
+      });
       setAgendamentos(resultado.dados);
       setTotalPaginas(resultado.totalPaginas);
     } catch {
-      setErro('Não foi possível carregar os agendamentos.');
+      setErro("Não foi possível carregar os agendamentos.");
     } finally {
       setCarregando(false);
     }
   }, [pagina, statusFiltro]);
 
- useEffect(() => {
-  queueMicrotask(() => {
-    buscar();
-  });
-}, [buscar]);
+  useEffect(() => {
+    queueMicrotask(() => {
+      buscar();
+    });
+  }, [buscar]);
 
   async function criar(payload: CriarAgendamentoPayload) {
     await criarAgendamento(payload);
-    await buscar(); // recarrega a lista após criar
+    await buscar();
   }
 
   async function cancelar(id: number) {
