@@ -34,7 +34,7 @@ export async function criarAgendamento(
 }
 export async function listarHorariosOcupados(
   profissionalId: number,
-  data: string, // formato "YYYY-MM-DD"
+  data: string,
 ): Promise<string[]> {
   const response = await api.get("/agendamentos/horarios-ocupados", {
     params: { profissionalId, data },
