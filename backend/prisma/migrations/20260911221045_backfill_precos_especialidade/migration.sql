@@ -1,0 +1,12 @@
+UPDATE "Especialidade" SET preco = 170 WHERE nome = 'Psicologia';
+UPDATE "Especialidade" SET preco = 180 WHERE nome = 'Nutrição';
+UPDATE "Especialidade" SET preco = 110 WHERE nome = 'Odontologia';
+UPDATE "Especialidade" SET preco = 180 WHERE nome = 'Cardiologia';
+UPDATE "Especialidade" SET preco = 180 WHERE nome = 'Oftalmologia';
+UPDATE "Especialidade" SET preco = 180 WHERE nome = 'Dermatologia';
+UPDATE "Especialidade" SET preco = 170 WHERE nome = 'Pediatria';
+UPDATE "Especialidade" SET preco = 180 WHERE nome = 'Otorrinolaringologia';
+UPDATE "Especialidade" SET preco = 170 WHERE nome = 'Ortopedia';
+UPDATE "Especialidade" SET preco = 170 WHERE nome = 'Endocrinologia';
+UPDATE "Especialidade" SET preco = 180 WHERE nome = 'Ginecologia';
+UPDATE "Especialidade" SET preco = 180 WHERE nome = 'Urologia';
