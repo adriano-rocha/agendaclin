@@ -41,4 +41,11 @@ export class PrismaEspecialidadeRepository implements IEspecialidadeRepository {
       Number(atualizada.preco),
     );
   }
+
+  async buscarPorId(id: number): Promise<Especialidade | null> {
+    const encontrada = await prisma.especialidade.findUnique({ where: { id } });
+    return encontrada
+      ? new Especialidade(encontrada.id, encontrada.nome, encontrada.duracaoPadrao, Number(encontrada.preco))
+      : null;
+  }
 }

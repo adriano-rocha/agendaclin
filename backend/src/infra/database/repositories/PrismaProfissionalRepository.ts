@@ -22,7 +22,14 @@ export class PrismaProfissionalRepository implements IProfissionalRepository {
     });
 
     return profissionais.map(
-    (p) => new Profissional(p.id, p.nome, p.especialidadeId, p.especialidade)
-  );
-}
+      (p) => new Profissional(p.id, p.nome, p.especialidadeId, p.especialidade),
+    );
+  }
+
+  async buscarPorId(id: number): Promise<Profissional | null> {
+    const encontrado = await prisma.profissional.findUnique({ where: { id } });
+    return encontrado
+      ? new Profissional(encontrado.id, encontrado.nome, encontrado.especialidadeId)
+      : null;
+  }
 }

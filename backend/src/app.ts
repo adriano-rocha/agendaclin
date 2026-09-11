@@ -6,8 +6,15 @@ import { especialidadeRoutes } from "./infra/http/routes/especialidade.routes";
 import { profissionalRoutes } from "./infra/http/routes/profissional.routes";
 import { autenticar } from "./infra/http/middlewares/autenticar";
 import { agendamentoRoutes } from "./infra/http/routes/agendamento.routes";
+import { webhookRoutes } from "./infra/http/routes/webhook.routes"; // 🔑 novo
 
 const app = express();
+
+// 🔑 webhookRoutes precisa vir ANTES de express.json() — essa rota usa seu
+// próprio parser (express.raw), então não pode passar pelo parser global
+// de JSON, que consumiria o corpo antes dela conseguir verificar a assinatura.
+app.use(webhookRoutes);
+
 app.use(express.json());
 
 const origensPermitidas = [

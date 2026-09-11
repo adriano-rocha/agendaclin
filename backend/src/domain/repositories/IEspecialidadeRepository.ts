@@ -10,4 +10,5 @@ export interface IEspecialidadeRepository {
   criar(especialidade: Especialidade): Promise<Especialidade>;
   listarTodas(): Promise<Especialidade[]>;
   atualizar(id: number, dados: DadosAtualizacaoEspecialidade): Promise<Especialidade>;
+  buscarPorId(id: number): Promise<Especialidade | null>;
 }

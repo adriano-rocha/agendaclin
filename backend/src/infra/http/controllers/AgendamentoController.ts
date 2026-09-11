@@ -6,6 +6,13 @@ import { CancelarAgendamento } from "../../../application/use-cases/CancelarAgen
 import { ConfirmarAgendamento } from "../../../application/use-cases/ConfirmarAgendamento";
 import { PrismaAgendamentoRepository } from "../../database/repositories/PrismaAgendamentoRepository";
 import { ListarHorariosOcupados } from "../../../application/use-cases/ListarHorariosOcupados";
+import { PrismaProfissionalRepository } from "../../database/repositories/PrismaProfissionalRepository";
+import { PrismaEspecialidadeRepository } from "../../database/repositories/PrismaEspecialidadeRepository";
+import { CriarSessaoCheckout } from "../../../application/use-cases/CriarSessaoCheckout";
+
+const profissionalRepository = new PrismaProfissionalRepository();
+const especialidadeRepository = new PrismaEspecialidadeRepository();
+const criarSessaoCheckout = new CriarSessaoCheckout();
 
 const agendamentoRepository = new PrismaAgendamentoRepository();
 
@@ -33,7 +40,31 @@ export async function criarAgendamentoController(req: Request, res: Response) {
       dataHoraInicio: new Date(dataHoraInicio),
     });
 
-    return res.status(201).json(novoAgendamento);
+    // 🔑 Profissional → Especialidade → preço, usando os repositórios
+    // já testados (com a conversão Number(preco) garantida).
+    const profissional = await profissionalRepository.buscarPorId(novoAgendamento.profissionalId);
+    const especialidade = profissional
+      ? await especialidadeRepository.buscarPorId(profissional.especialidadeId)
+      : null;
+
+    if (!especialidade) {
+      // Agendamento já foi criado — não desfazemos por segurança, só avisamos.
+      return res.status(201).json({
+        ...novoAgendamento,
+        erroPagamento: "Especialidade não encontrada para gerar cobrança.",
+      });
+    }
+
+    const sessao = await criarSessaoCheckout.executar({
+      agendamentoId: novoAgendamento.id!,
+      nomeEspecialidade: especialidade.nome,
+      preco: especialidade.preco,
+    });
+
+    return res.status(201).json({
+      agendamento: novoAgendamento,
+      urlPagamento: sessao.url,
+    });
   } catch (erro) {
     if (erro instanceof Error && erro.message.includes("Conflito de horário")) {
       return res.status(409).json({ erro: erro.message });
