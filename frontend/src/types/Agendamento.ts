@@ -1,5 +1,3 @@
-// frontend/src/types/Agendamento.ts
-
 export type StatusAgendamento =
   | "PENDENTE"
   | "CONFIRMADO"

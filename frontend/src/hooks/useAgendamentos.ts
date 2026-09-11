@@ -45,9 +45,10 @@ export function useAgendamentos(paginaInicial = 1, statusFiltro?: string) {
     });
   }, [buscar]);
 
+ 
   async function criar(payload: CriarAgendamentoPayload) {
-    await criarAgendamento(payload);
-    await buscar();
+    const { urlPagamento } = await criarAgendamento(payload);
+    window.location.href = urlPagamento;
   }
 
   async function cancelar(id: number) {
