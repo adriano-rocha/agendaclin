@@ -1,5 +1,3 @@
-// backend/src/infra/database/repositories/PrismaAgendamentoRepository.ts
-
 import { PrismaClient } from '@prisma/client';
 import { IAgendamentoRepository, FiltrosAgendamento } from '../../../domain/repositories/IAgendamentoRepository';
 import { Agendamento, StatusAgendamento } from '../../../domain/entities/Agendamento';

@@ -36,6 +36,13 @@ function obterDataMinima(): string {
   return hoje.toISOString().slice(0, 10);
 }
 
+function formatarPreco(valor: number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(valor);
+}
+
 export function NovoAgendamento() {
   const { usuario } = useAuth();
   const { criar } = useAgendamentos();
@@ -74,11 +81,6 @@ export function NovoAgendamento() {
     carregarOpcoes();
   }, []);
 
-  // 🔑 Sempre que profissional OU data mudarem, busca de novo quais horários
-  // já estão ocupados. O guard (sem profissional/data) e o setState do
-  // resultado da API ficam AMBOS dentro da função async, disparada via
-  // queueMicrotask — assim nenhum setState roda de forma síncrona no
-  // corpo do effect (mesmo ajuste já usado no useAgendamentos.ts).
   useEffect(() => {
     async function buscarHorariosOcupados() {
       if (!profissionalId || !data) {
@@ -173,7 +175,7 @@ export function NovoAgendamento() {
               <option value="">Selecione</option>
               {especialidades.map((esp) => (
                 <option key={esp.id} value={esp.id}>
-                  {esp.nome}
+                  {esp.nome} — {formatarPreco(esp.preco)}
                 </option>
               ))}
             </select>
@@ -321,6 +323,14 @@ export function NovoAgendamento() {
                 <dt className="text-gray-500">Local</dt>
                 <dd className="text-gray-900 font-medium text-right">
                   {ENDERECO_CLINICA}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-2 border-t border-gray-100 pt-3 mt-1">
+                <dt className="text-gray-700 font-medium">Valor</dt>
+                <dd className="text-primary font-semibold text-right">
+                  {especialidadeSelecionada
+                    ? formatarPreco(especialidadeSelecionada.preco)
+                    : "—"}
                 </dd>
               </div>
             </dl>
