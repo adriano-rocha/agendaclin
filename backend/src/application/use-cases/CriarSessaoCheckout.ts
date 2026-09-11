@@ -5,11 +5,19 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 interface CriarSessaoCheckoutInput {
   agendamentoId: number;
   nomeEspecialidade: string;
-  preco: number; // em reais (ex: 150.00)
+  preco: number; 
 }
 
 export class CriarSessaoCheckout {
   async executar(input: CriarSessaoCheckoutInput): Promise<{ url: string }> {
+    const precoNumerico = Number(input.preco);
+  
+    if (!precoNumerico || precoNumerico <= 0) {
+      throw new Error(
+        `Não é possível gerar cobrança: especialidade "${input.nomeEspecialidade}" está sem preço configurado (preco=${input.preco}).`
+      );
+    }
+
     const sessao = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -18,13 +26,12 @@ export class CriarSessaoCheckout {
           price_data: {
             currency: "brl",
             product_data: { name: `Consulta — ${input.nomeEspecialidade}` },
-            unit_amount: Math.round(input.preco * 100), // 🔑 Stripe trabalha em centavos
+            unit_amount: Math.round(precoNumerico * 100), // 🔑 Stripe trabalha em centavos
           },
           quantity: 1,
         },
       ],
-      // 🔑 metadata viaja junto com a sessão e volta pro webhook depois —
-      // é assim que o webhook sabe QUAL agendamento confirmar.
+     
       metadata: {
         agendamentoId: String(input.agendamentoId),
       },

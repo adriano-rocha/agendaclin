@@ -42,7 +42,9 @@ export async function criarAgendamentoController(req: Request, res: Response) {
 
     // 🔑 Profissional → Especialidade → preço, usando os repositórios
     // já testados (com a conversão Number(preco) garantida).
-    const profissional = await profissionalRepository.buscarPorId(novoAgendamento.profissionalId);
+    const profissional = await profissionalRepository.buscarPorId(
+      novoAgendamento.profissionalId,
+    );
     const especialidade = profissional
       ? await especialidadeRepository.buscarPorId(profissional.especialidadeId)
       : null;
@@ -55,11 +57,26 @@ export async function criarAgendamentoController(req: Request, res: Response) {
       });
     }
 
-    const sessao = await criarSessaoCheckout.executar({
-      agendamentoId: novoAgendamento.id!,
-      nomeEspecialidade: especialidade.nome,
-      preco: especialidade.preco,
-    });
+    let sessao;
+    try {
+      sessao = await criarSessaoCheckout.executar({
+        agendamentoId: novoAgendamento.id!,
+        nomeEspecialidade: especialidade.nome,
+        preco: especialidade.preco,
+      });
+    } catch (erroCheckout) {
+      console.error(
+        `[ALERTA] Falha ao gerar checkout para agendamento ${novoAgendamento.id}:`,
+        erroCheckout,
+      );
+      return res.status(201).json({
+        ...novoAgendamento,
+        erroPagamento:
+          erroCheckout instanceof Error
+            ? erroCheckout.message
+            : "Erro ao gerar cobrança.",
+      });
+    }
 
     return res.status(201).json({
       agendamento: novoAgendamento,
